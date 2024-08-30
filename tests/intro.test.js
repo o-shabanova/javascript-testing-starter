@@ -1,5 +1,5 @@
 import {describe, test, it, expect} from 'vitest';
-import {fizzBuzz, max} from "../src/intro.js";
+import {findFactorial, fizzBuzz, max} from "../src/intro.js";
 
 describe('max', () => {
     it('should return the first argument if it is greater', () => {
@@ -34,3 +34,33 @@ describe('fizzBuzz', () => {
         expect(fizzBuzz(-7)).toBe('-7');
     });
 });
+
+describe('findFactorial', () => {
+    it('should return 1 if n===0', () => {
+        expect(findFactorial(0)).toBe(1);
+    });
+
+    it('should return 1 if n===0', () => {
+        expect(findFactorial(1)).toBe(1);
+    });
+
+    it('should return  if n===0', () => {
+        expect(findFactorial(1)).toBe(1);
+    });
+
+    it(`should return 'undefined' or handle error if n is negative number`, () => {
+        expect(findFactorial(-2)).toBeUndefined();
+    });
+
+    it(`should return 'undefined' or handle error if n is non-integer number`, () => {
+        expect(findFactorial(2.2)).toBeUndefined();
+    });
+
+    it('should return 2 for n=2', ()=> {
+        expect(findFactorial(2)).toBe(2);
+    });
+
+    it(`should return correct number`, () => {
+        expect(findFactorial(20)).toBe(2432902008176640000);
+    });
+})
