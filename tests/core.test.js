@@ -1,5 +1,5 @@
 import {describe, it, expect} from "vitest";
-import {getCoupons, validateUserInput} from "../src/core.js";
+import {getCoupons, isPriceInRange, isValidUsername, validateUserInput} from "../src/core.js";
 
 describe ('testing getCoupons', () => {
     const coupons = getCoupons();
@@ -72,4 +72,34 @@ describe ('testing validateUserInput', () => {
         expect(validateUserInput('ol', '17')).toMatch(/invalid age/i);
 
     });
+});
+
+//isValidUsername testing
+
+describe('isValidUsername testing', () => {
+    const minLength = 5;
+    const maxLength = 15;
+    it('should return false if userLength is too short', () => {
+        //чому це не працює?
+        expect(isValidUsername('Ole')).toBe(false);
+        expect(isValidUsername('a'.repeat(minLength - 1))).toBe(false);
+
+    });
+    it('should return false if userLength is too long', () => {
+        expect(isValidUsername('a'.repeat(maxLength + 1))).toBe(false);
+    });
+
+    it('should return true if userLength is exactly equal min or max', () => {
+        expect(isValidUsername('a'.repeat(maxLength))).toBe(true);
+        expect(isValidUsername('a'.repeat(minLength))).toBe(true);
+
+    });
+
+    it('should return false for invalid input types', () => {
+        expect(isValidUsername(null)).toBe(false);
+        expect(isValidUsername(undefined)).toBe(false);
+        expect(isValidUsername(1)).toBe(false);
+
+    });
+
 })
