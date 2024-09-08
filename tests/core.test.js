@@ -128,3 +128,21 @@ describe('canDrive testing', () => {
         expect(canDrive(18, 'UK')).toBe(true);
     });
 })
+
+//Rewriting test for canDrive function with Parameterized tests
+
+describe('canDrive testing with parametrized tests', () => {
+    it('should return error if country code is invalid', () => {
+        expect(canDrive(16, 'UA')).toMatch(/invalid/i);
+    });
+    it.each([
+        {age: 15, country: 'US', result: false},
+        { age: 16, country: 'US', result: true },
+        { age: 17, country: 'US', result: true },
+        { age: 16, country: 'UK', result: false },
+        { age: 17, country: 'UK', result: true },
+        { age: 18, country: 'UK', result: true }
+    ])('should return $result for $age, $country', ({ age, country, result }) => { //here is example of object destructing
+        expect(canDrive(age, country)).toBe(result);
+    })
+});
