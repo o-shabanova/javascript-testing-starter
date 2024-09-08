@@ -1,5 +1,13 @@
 import {describe, it, expect} from "vitest";
-import {canDrive, getCoupons, isPriceInRange, isValidUsername, validateUserInput} from "../src/core.js";
+import {
+    canDrive,
+    fetchData,
+    fetchDataTwo,
+    getCoupons,
+    isPriceInRange,
+    isValidUsername,
+    validateUserInput
+} from "../src/core.js";
 
 describe ('testing getCoupons', () => {
     const coupons = getCoupons();
@@ -160,3 +168,38 @@ describe('isPriceInRange', () => {
         expect(isPriceInRange(price, 0, 100)).toBe(result);
     })
 })
+
+//testing asynhronous code Mosh`s example ecplanation
+
+describe('fetchData Promise reject', () => {
+    it('should return a promise that will resolve to an array of numbers', async () => {
+        try {
+            const result = await fetchData();
+        } catch (error) {
+           expect(error).toHaveProperty('reason');
+           expect(error.reason).toMatch(/fail/i);
+        }
+    });
+});
+
+describe('fetchDataTwo with Promise resolve', () => {
+
+    it('should return a promise that will resolve an array of numbers', () => {
+        fetchDataTwo().then((result) => {
+            expect(Array.isArray(result)).toBe(true);
+            expect(result.length).toBeGreaterThan(0);
+        });
+    })
+
+    //or
+
+    it('should return a promise that will resolve an array of numbers', async () => {
+            const result = await fetchDataTwo();
+            expect(Array.isArray(result)).toBe(true);
+            expect(result.length).toBeGreaterThan(0);
+        });
+
+
+})
+
+
