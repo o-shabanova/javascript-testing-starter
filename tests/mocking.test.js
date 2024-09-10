@@ -1,10 +1,14 @@
 import {it, expect, describe, vi} from "vitest"
-import {getPriceInCurrency, getShippingInfo} from "../src/mocking.js";
+import {getPriceInCurrency, getShippingInfo, renderPage, submitOrder} from "../src/mocking.js";
 import {getExchangeRate} from "../src/libs/currency.js";
 import {getShippingQuote} from "../src/libs/shipping.js";
+import {charge} from "../src/libs/payment.js";
+import {trackPageView} from "../src/libs/analytics.js";
 
 vi.mock('../src/libs/currency');
 vi.mock('../src/libs/shipping');
+vi.mock('../src/libs/analytics');
+vi.mock('../src/libs/payment');
 
 describe ('test suite', () => {
     it('test case', () => {
@@ -43,3 +47,56 @@ describe ('testing getShippingInfo', () => {
         expect(result).toMatch(/shipping cost: \$15 \(3 days\)/i);
     })
 })
+
+//renderPage
+describe('renderPage', () => {
+    it('should return correct content', async () => {
+        const result = await renderPage();
+
+        expect(result).toMatch(/content/i);
+    });
+
+    it('should call analytics', async () => {
+        await renderPage();
+
+        expect(trackPageView).toHaveBeenCalledWith('/home');
+    });
+});
+
+//submitOrder testing
+describe('submitOrder', () => {
+    const order = { totalAmount: 10 };
+    const creditCard = { creditCardNumber: '1234' };
+
+    it('should calls charge with the right arguments', async () => {
+        vi.mocked(charge).mockResolvedValue({ status: 'success' });
+
+        await submitOrder(order, creditCard);
+
+        expect(charge).toHaveBeenCalledWith(creditCard, order.totalAmount);
+    });
+
+    it('should return success when payment is successful', async () => {
+        vi.mocked(charge).mockResolvedValue({ status: 'success' });
+
+        const result = await submitOrder(order, creditCard);
+
+        expect(result).toEqual({ success: true });
+    });
+
+    it('should return success when payment is successful', async () => {
+        vi.mocked(charge).mockResolvedValue({ status: 'failed' });
+
+        const result = await submitOrder(order, creditCard);
+
+        expect(result).toEqual({ success: false, error: 'payment_error'});
+    });
+
+
+
+})
+
+
+//failed payment
+
+//successful payment
