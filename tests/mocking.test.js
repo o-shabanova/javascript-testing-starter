@@ -1,14 +1,22 @@
 import {it, expect, describe, vi} from "vitest"
-import {getPriceInCurrency, getShippingInfo, renderPage, submitOrder} from "../src/mocking.js";
+import {getPriceInCurrency, getShippingInfo, renderPage, signUp, submitOrder} from "../src/mocking.js";
 import {getExchangeRate} from "../src/libs/currency.js";
 import {getShippingQuote} from "../src/libs/shipping.js";
 import {charge} from "../src/libs/payment.js";
 import {trackPageView} from "../src/libs/analytics.js";
+import {sendEmail} from "../src/libs/email.js";
 
 vi.mock('../src/libs/currency');
 vi.mock('../src/libs/shipping');
 vi.mock('../src/libs/analytics');
 vi.mock('../src/libs/payment');
+vi.mock('../src/libs/email', async (importOriginal) => {
+    const originalModule = await importOriginal();
+    return {
+        ...originalModule,
+        sendEmail: vi.fn()
+    }
+});
 
 describe ('test suite', () => {
     it('test case', () => {
@@ -96,7 +104,30 @@ describe('submitOrder', () => {
 
 })
 
+//signUp
+describe('signUp', () => {
+    const email = 'bla-bla@gmail.com';
+    it('should return false if email is not valid', async () => {
+        const result = await signUp('a');
 
-//failed payment
+        expect(result).toBe(false);
+    });
 
-//successful payment
+    it('should return true if email is valid', async () => {
+        const result = await signUp(email);
+
+        expect(result).toBe(true);
+    });
+
+    it('should send the welcome email if email is valid', async () => {
+
+        const result = await signUp(email);
+
+        expect(sendEmail).toHaveBeenCalled();
+        const args = vi.mocked(sendEmail).mock.calls[0];
+
+        expect(args[0]).toBe(email);
+        expect(args[1]).toMatch(/welcome/i);
+    });
+})
+
