@@ -1,10 +1,11 @@
 import {it, expect, describe, vi} from "vitest"
-import {getPriceInCurrency, getShippingInfo, renderPage, signUp, submitOrder} from "../src/mocking.js";
+import {getPriceInCurrency, getShippingInfo, isOnline, login, renderPage, signUp, submitOrder} from "../src/mocking.js";
 import {getExchangeRate} from "../src/libs/currency.js";
 import {getShippingQuote} from "../src/libs/shipping.js";
 import {charge} from "../src/libs/payment.js";
 import {trackPageView} from "../src/libs/analytics.js";
 import {sendEmail} from "../src/libs/email.js";
+import security from "../src/libs/security.js";
 
 vi.mock('../src/libs/currency');
 vi.mock('../src/libs/shipping');
@@ -131,3 +132,32 @@ describe('signUp', () => {
     });
 })
 
+describe('login', () => {
+    it('should email the one-time login code', async () => {
+        const email = 'name@domain.com';
+        const spy = vi.spyOn(security, 'generateCode');
+
+        await login(email);
+
+        const securityCode = spy.mock.results[0].value.toString();
+        expect(sendEmail).toHaveBeenCalledWith(email, securityCode);
+    });
+});
+
+describe('isOnline', () => {
+    it('should return false if current hour is outside opening hours', () => {
+        vi.setSystemTime('2024-01-01 07:59');
+        expect(isOnline()).toBe(false);
+
+        vi.setSystemTime('2024-01-01 20:01');
+        expect(isOnline()).toBe(false);
+    });
+
+    it('should return true if current hour is within opening hours', () => {
+        vi.setSystemTime('2024-01-01 08:00');
+        expect(isOnline()).toBe(true);
+
+        vi.setSystemTime('2024-01-01 19:59');
+        expect(isOnline()).toBe(true);
+    });
+});
