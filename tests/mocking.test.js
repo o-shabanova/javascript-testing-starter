@@ -1,5 +1,14 @@
 import {it, expect, describe, vi} from "vitest"
-import {getPriceInCurrency, getShippingInfo, isOnline, login, renderPage, signUp, submitOrder} from "../src/mocking.js";
+import {
+    getDiscount,
+    getPriceInCurrency,
+    getShippingInfo,
+    isOnline,
+    login,
+    renderPage,
+    signUp,
+    submitOrder
+} from "../src/mocking.js";
 import {getExchangeRate} from "../src/libs/currency.js";
 import {getShippingQuote} from "../src/libs/shipping.js";
 import {charge} from "../src/libs/payment.js";
@@ -161,3 +170,26 @@ describe('isOnline', () => {
         expect(isOnline()).toBe(true);
     });
 });
+
+describe('getDiscount', () => {
+    //Christmas day discount
+    it('should return 0.2 if today is Christmas day', () => {
+        vi.setSystemTime('2024-12-25 00:01');
+        expect(getDiscount()).toBe(0.2);
+    });
+
+    it('should return 0.2 if today is Christmas day', () => {
+        vi.setSystemTime('2024-12-25 23:59');
+        expect(getDiscount()).toBe(0.2);
+    });
+    //every other day discount
+    it('should return 0 if today is NOT Christmas day', () => {
+        vi.setSystemTime('2024-12-24 15:00');
+        expect(getDiscount()).toBe(0);
+    });
+
+    it('should return 0 if today is NOT Christmas day', () => {
+        vi.setSystemTime('2024-12-26 15:00');
+        expect(getDiscount()).toBe(0);
+    });
+})
